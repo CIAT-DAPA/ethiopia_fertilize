@@ -177,6 +177,8 @@
             d3.csv("https://raw.githubusercontent.com/CIAT-DAPA/ethiopia_fertilize/master/data/" + index + ".csv", function (error, data) {
                 if (error) {
                     console.log(error);  //Log the error.
+                    $("#plot svg").html('');
+                    $("#rate_optimal").html('');
                 }
                 else {
                     var rate_optimal = data.filter(function (item) { return item.yield == d3.max(data, function (item) { return item.yield; }) });
