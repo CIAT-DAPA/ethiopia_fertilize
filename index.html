@@ -188,16 +188,6 @@
                         }),      //values - represents the array of {x,y} data points
                         key: 'Yield', //key  - the name of the series.
                         color: '#ff7f0e'  //color - optional: choose your own line color.
-                    },
-                    {
-                        values: data.map(function (item) {
-                            return {
-                                x: item.rate,
-                                y: item.yield_norm
-                            }
-                        }),      //values - represents the array of {x,y} data points
-                        key: 'Yield Normalized', //key  - the name of the series.
-                        color: '#ff440e'  //color - optional: choose your own line color.
                     }];
                     plot(data);
                 }
