@@ -29,3 +29,8 @@
         max-width: 540px;
     }
 }
+
+#map { 
+    height: 500px; 
+    width: 100%;
+}
