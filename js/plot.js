@@ -8,15 +8,15 @@ function plot(data){
         ;
       
         chart.xAxis     //Chart x-axis settings
-            .axisLabel('Rate')
+            .axisLabel('N Rate')
             .tickFormat(d3.format('.02f'));
       
         chart.yAxis     //Chart y-axis settings
-            .axisLabel('Yield')
+            .axisLabel('Yield (kg/ha)')
             .tickFormat(d3.format('.02f'));
       
       
-        d3.select('#chart svg')    //Select the <svg> element you want to render the chart in.   
+        d3.select('#plot svg')    //Select the <svg> element you want to render the chart in.   
             .datum(data)         //Populate the <svg> element with chart data...
             .call(chart);          //Finally, render the chart!
       
