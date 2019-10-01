@@ -172,6 +172,8 @@
             var row = NROWS - parseInt((lat - YLLCORNER) / CELLSIZE);
             var index = parseInt((NCOLS * row) - (NCOLS - col));
 
+            console.log("col: " + col + " row: "+ row + " index:" + index);
+
             d3.csv("https://raw.githubusercontent.com/CIAT-DAPA/ethiopia_fertilize/master/data/" + index + ".csv", function (error, data) {
                 if (error) {
                     console.log(error);  //Log the error.
