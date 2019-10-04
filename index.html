@@ -162,11 +162,11 @@
             var lat = coord.lat;
             var lng = coord.lng;
 
-            var NCOLS = 1824,
-                NROWS = 1416,
-                XLLCORNER = 32.8999999999999986,
-                YLLCORNER = 15.0000000000000000,
-                CELLSIZE = 0.00833333;
+            var NCOLS = 155,
+                NROWS = 119,
+                XLLCORNER = 32.6500007845461369,
+                YLLCORNER = 15.1499999277293682,
+                CELLSIZE = 0.1;
 
             var col = parseInt((lng - XLLCORNER) / CELLSIZE) + 1;
             var row = NROWS - parseInt((lat - YLLCORNER) / CELLSIZE);
@@ -177,8 +177,10 @@
             d3.csv("https://raw.githubusercontent.com/CIAT-DAPA/ethiopia_fertilize/master/data/" + index + ".csv", function (error, data) {
                 if (error) {
                     console.log(error);  //Log the error.
+                    console.log("Clearing data");
                     $("#plot svg").html('');
                     $("#rate_optimal").html('');
+
                 }
                 else {
                     var rate_optimal = data.filter(function (item) { return item.yield == d3.max(data, function (item) { return item.yield; }) });
