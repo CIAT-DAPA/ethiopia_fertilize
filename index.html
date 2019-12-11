@@ -83,13 +83,23 @@
                 </div>
                 <div class="col-lg-5">
                     <div class="card mb-4 shadow-sm">
-                        <h2 class="text-center">Yield fertilize response</h2>
+                        <h2 class="text-center">Yield fertilize response Cluster #<span id="cluster"></span></h2>
                         <div class="card-body">
                             <p>
-                                The optimal rate is <span id="rate_optimal"></span> (kg/ha)
+                                <span id="rate_optimal"></span>
                             </p>
                             <div id="plot">
                                 <svg></svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="card mb-4 shadow-sm">
+                        <h2 class="text-center">Enviromentals variables</h2>
+                        <div class="card-body">
+                            <div id="cp">
+
                             </div>
                         </div>
                     </div>
@@ -134,11 +144,11 @@
 
                 chart.xAxis     //Chart x-axis settings
                     .axisLabel('N Rate')
-                    .tickFormat(d3.format('.02f'));
+                    .tickFormat(d3.format('.0f'));
 
                 chart.yAxis     //Chart y-axis settings
                     .axisLabel('Yield (kg/ha)')
-                    .tickFormat(d3.format('.02f'));
+                    .tickFormat(d3.format('.0f'));
 
 
                 d3.select('#plot svg')    //Select the <svg> element you want to render the chart in.   
@@ -151,6 +161,62 @@
             });
         }
 
+        var myColor = d3.scale.linear().domain([1,40])
+                                .interpolate(d3.interpolateHcl)
+                                .range([d3.rgb("#007AFF"), d3.rgb('#FFF500')]);
+
+        function onEachFeature(feature, layer) {
+            
+            if (layer.feature && layer.feature.id) {
+                layer.setStyle({
+                    fillColor :myColor(layer.feature.id),
+                    fillOpacity: 0.8,
+                    weight: 0.5
+                });
+                
+                layer.on('click', function (e) {
+                    d3.csv("https://raw.githubusercontent.com/CIAT-DAPA/ethiopia_fertilize/master/data/40/env/cluster_properties.csv", function (error, data) {
+                        cp = data.filter(function(item){ return item.id == layer.feature.id; });
+                        if(cp.length > 0){
+                            var table = '<table class="table">';
+                            for (var key in cp[0]) {
+                                table = table + '<tr><th>' + key + '</th><td>' + cp[0][key] + '</td></tr>';
+                            }
+                            table = table + '</table>';
+                            $("#cp").html(table);
+                        }
+                        
+                    });
+                    d3.csv("https://raw.githubusercontent.com/CIAT-DAPA/ethiopia_fertilize/master/data/40/rates/" + layer.feature.id + ".csv", function (error, data) {
+                        if (error) {
+                            console.log(error);  //Log the error.
+                            console.log("Clearing data");
+                            $("#plot svg").html('');
+                            $("#rate_optimal").html('');
+                            $("#cluster").html('');
+                        }
+                        else {
+                            $("#cluster").html(layer.feature.id);
+                            var rate_optimal = data.filter(function (item) { return item.yield == d3.max(data, function (item) { return item.yield; }) });
+                            $("#rate_optimal").html('The optimal rate is <b>'+ d3.format(".2f")(d3.min(rate_optimal, function (item) { return item.rate; })) + ' (kg/ha)</b>.');
+                            var data = [{
+                                values: data.map(function (item) {
+                                    return {
+                                        x: parseInt(item.rate),
+                                        y: parseFloat(item.yield)
+                                    }
+                                }),      //values - represents the array of {x,y} data points
+                                key: 'Yield', //key  - the name of the series.
+                                color: '#ff7f0e'  //color - optional: choose your own line color.
+                            }];
+                            plot(data);
+                        }
+                    });
+                });
+            }
+            
+        }
+
         var map = L.map('map').setView([8.9661428, 38.6950282], 6);        
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -159,51 +225,12 @@
 
         var layer_url = "https://raw.githubusercontent.com/CIAT-DAPA/ethiopia_fertilize/master/data/40/map/map.geojson";
 
-        var layer = new L.GeoJSON.AJAX(layer_url); 
-        L.geoJSON(geojsonFeature).addTo(map);
-
-        map.on('click', function (e) {
-            /*var coord = e.latlng;
-            var lat = coord.lat;
-            var lng = coord.lng;
-
-            var NCOLS = 155,
-                NROWS = 119,
-                XLLCORNER = 32.6500007845461369,
-                YLLCORNER = 15.1499999277293682,
-                CELLSIZE = 0.1;
-
-            var col = parseInt((lng - XLLCORNER) / CELLSIZE) + 1;
-            var row = NROWS - parseInt((lat - YLLCORNER) / CELLSIZE);
-            var index = parseInt((NCOLS * row) - (NCOLS - col));
-
-            console.log("col: " + col + " row: "+ row + " index:" + index);
-
-            d3.csv("https://raw.githubusercontent.com/CIAT-DAPA/ethiopia_fertilize/master/data/40/" + index + ".csv", function (error, data) {
-                if (error) {
-                    console.log(error);  //Log the error.
-                    console.log("Clearing data");
-                    $("#plot svg").html('');
-                    $("#rate_optimal").html('');
-
-                }
-                else {
-                    var rate_optimal = data.filter(function (item) { return item.yield == d3.max(data, function (item) { return item.yield; }) });
-                    $("#rate_optimal").html(d3.format(".2f")(d3.min(rate_optimal, function (item) { return item.rate; })));
-                    var data = [{
-                        values: data.map(function (item) {
-                            return {
-                                x: item.rate,
-                                y: item.yield
-                            }
-                        }),      //values - represents the array of {x,y} data points
-                        key: 'Yield', //key  - the name of the series.
-                        color: '#ff7f0e'  //color - optional: choose your own line color.
-                    }];
-                    plot(data);
-                }
-            });*/
+        $.getJSON(layer_url, function(data) {
+            L.geoJSON(data,{onEachFeature: onEachFeature}).addTo(map);
         });
+
+        
+
     </script>
 </body>
 
