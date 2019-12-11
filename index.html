@@ -151,14 +151,19 @@
             });
         }
 
-        var map = L.map('map').setView([8.9661428, 38.6950282], 6);
+        var map = L.map('map').setView([8.9661428, 38.6950282], 6);        
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
+        var layer_url = "https://raw.githubusercontent.com/CIAT-DAPA/ethiopia_fertilize/master/data/40/map/map.geojson";
+
+        var layer = new L.GeoJSON.AJAX(layer_url); 
+        L.geoJSON(geojsonFeature).addTo(map);
+
         map.on('click', function (e) {
-            var coord = e.latlng;
+            /*var coord = e.latlng;
             var lat = coord.lat;
             var lng = coord.lng;
 
@@ -174,7 +179,7 @@
 
             console.log("col: " + col + " row: "+ row + " index:" + index);
 
-            d3.csv("https://raw.githubusercontent.com/CIAT-DAPA/ethiopia_fertilize/master/data/" + index + ".csv", function (error, data) {
+            d3.csv("https://raw.githubusercontent.com/CIAT-DAPA/ethiopia_fertilize/master/data/40/" + index + ".csv", function (error, data) {
                 if (error) {
                     console.log(error);  //Log the error.
                     console.log("Clearing data");
@@ -197,7 +202,7 @@
                     }];
                     plot(data);
                 }
-            });
+            });*/
         });
     </script>
 </body>
